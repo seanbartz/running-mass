@@ -1,0 +1,103 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue Mar 16 16:55:12 2021
+Plot the chiral field and test function for given parameters, to examine graphically
+This is for the model with three flavors of quarks, with equal mass.
+@author: seanbartz
+"""
+
+import numpy as np
+from scipy.integrate import odeint
+from solveTmu import blackness
+
+import matplotlib.pyplot as plt
+
+# "temperature in MeV"
+Temp=185.
+#light quark mass
+ml=30
+#chem potential
+mu=30
+
+#value of the cube root of chiral condensate in MeV
+sl=200
+
+
+
+
+def chiral(y,u,params):
+    chi,chip=y
+    v3,v4,mu1,mu0,mu2,zh,q=params
+    
+    Q=q*zh**3
+    
+    #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
+    "derivative of the dilaton, using exp parameterization"
+    phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    'Reissner-Nordstrom blackness function and its derivative.'
+    f= 1 - (1+Q**2)*u**4 + Q**2*u**6
+    fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
+    "EOM for chiral field"
+    derivs=[chip,
+            ((3*f-u*fp+u*f*phip)/(u*f))*chip - (3*chi-3*v3*chi**2-4*v4*chi**3)/(u**2*f)]
+            #((3+u**4)/(u-u**5) +phip)*chip - (-3*chi+4*v4*chi**3)/(u**2-u**6) ]
+            
+    return derivs
+
+"solve for horizon and charge"
+zh,q=blackness(Temp,mu)
+Q=q*zh**3
+"""
+limits of spatial variable z/zh. Should be close to 0 and 1, but 
+cannot go all the way to 0 or 1 because functions diverge there
+"""
+ui = 0.01
+uf = 0.999
+"Create the spatial variable mesh"
+umesh=100
+u=np.linspace(ui,uf,umesh)
+
+
+#parameters for dilaton. See papers
+mu0 = 430
+mu1 = 830
+mu2 = 176
+
+
+ 
+
+"This is a constant that goes into the boundary conditions"
+eta=np.sqrt(3)/(2*np.pi)
+
+"For the scalar potential in the action"
+"see papers by Bartz, Jacobson"
+#v3= -3 #only needed for 2+1 flavor or 3 flavor
+v4 = 8
+v3 = -3
+    
+#sigmal=260**3
+params=v3,v4,mu1,mu0,mu2,zh,q
+"blackness function and its derivative, Reissner-Nordstrom metric"
+"This version is for finite temp, finite chemical potential"
+f = 1 - (1+Q**2)*u**4 + Q**2*u**6
+fp = -4*(1+Q**2)*u**3 + 6*Q**2*u**5
+
+sigmal = sl**3
+UVbound = [ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]
+
+"solve for the chiral field"
+chiFields=odeint(chiral,UVbound,u,args=(params,))
+
+"test function defined to find when the chiral field doesn't diverge"
+"When test function is zero at uf, the chiral field doesn't diverge"
+test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]-3*v3*chiFields[:,0]**2-4*v4*chiFields[:,0]**3)
+testIR = test[umesh-1]#value of test function at uf
+
+#chiralPot=v3*chiFields[:,0]**3+v4*chiFields[:,0]**4
+
+plt.plot(u,chiFields[:,0])
+plt.xlabel(r'$z/z_h$')
+plt.ylabel(r'$\chi(z)$')
+#plt.plot(u,test)
+#plt.plot(u,chiralPot)

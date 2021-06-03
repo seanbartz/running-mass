@@ -1,0 +1,151 @@
+#!/usr/bin/env python3
+# -*- coding: utf-8 -*-
+"""
+Created on Tue March 16  2021
+For a given quark mass and chemical potential, 
+solves for all sigma values for a range of temperatures.
+If there are multiple values, then the transition is 1st order.
+@author: seanbartz
+"""
+import numpy as np
+from scipy.integrate import odeint
+from solveTmu import blackness
+
+import matplotlib.pyplot as plt
+
+#import time
+
+
+#light quark mass
+ml=30
+
+#chemical potential
+mu=30
+
+tmin=182
+tmax=188
+numtemp=20
+
+
+
+
+def chiral(y,u,params):
+    chi,chip=y
+    v3,v4,mu1,mu0,mu2,zh,q=params
+    
+    Q=q*zh**3
+    
+    #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
+    "derivative of the dilaton, using exp parameterization"
+    phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    f= 1 - (1+Q**2)*u**4 + Q**2*u**6
+    fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
+    "EOM for chiral field"
+    derivs=[chip,
+            ((3*f-u*fp+u*f*phip)/(u*f))*chip - (3*chi-3*v3*chi**2-4*v4*chi**3)/(u**2*f)]
+            #((3+u**4)/(u-u**5) +phip)*chip - (-3*chi+4*v4*chi**3)/(u**2-u**6) ]
+            
+    return derivs
+
+def sigmasearch(T,mu,ml):
+    "solve for horizon and charge"
+    zh,q=blackness(T,mu)
+    Q=q*zh**3
+    """
+    limits of spatial variable z/zh. Should be close to 0 and 1, but 
+    cannot go all the way to 0 or 1 because functions diverge there
+    """
+    ui = 0.01
+    uf = 0.999
+    "Create the spatial variable mesh"
+    umesh=100
+    u=np.linspace(ui,uf,umesh)
+    
+    
+    #parameters for dilaton. See papers
+    mu0 = 430
+    mu1 = 830
+    mu2 = 176
+    
+    
+ 
+    
+    "This is a constant that goes into the boundary conditions"
+    eta=np.sqrt(3)/(2*np.pi)
+    
+    "For the scalar potential in the action"
+    "see papers by Bartz, Jacobson"
+    #v3= -3 #only needed for 2+1 flavor
+    v4 = 8
+    v3 = -3
+        
+    #sigmal=260**3
+    params=v3,v4,mu1,mu0,mu2,zh,q
+    "blackness function and its derivative, Reissner-Nordstrom metric"
+    "This version is for finite temp, finite chemical potential"
+    f = 1 - (1+Q**2)*u**4 + Q**2*u**6
+    fp = -4*(1+Q**2)*u**3 + 6*Q**2*u**5
+    
+    "stepsize for search over sigma"
+    "Note: search should be done over cube root of sigma, here called sl"
+    deltasig = 1
+    #tic = time.perf_counter()
+    minsigma = 260
+    maxsigma = 500
+    truesigma = 0
+    "This version steps over all values to find multiple solutions at some temps"
+    
+    "initial values for comparing test function"
+    oldtest=0
+    j=0
+    truesigma=np.zeros(3)
+
+    for sl in range (minsigma,maxsigma,deltasig):
+    
+        "values for chiral field and derivative at UV boundary"
+        sigmal = sl**3
+        UVbound = [ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]
+        
+        "solve for the chiral field"
+        chiFields=odeint(chiral,UVbound,u,args=(params,))
+        
+        "test function defined to find when the chiral field doesn't diverge"
+        "When test function is zero at uf, the chiral field doesn't diverge"
+        test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]-3*v3*chiFields[:,0]**2-4*v4*chiFields[:,0]**3)
+        testIR = test[umesh-1]#value of test function at uf
+        
+        "when test function crosses zero, it will go from + to -, or vice versa"
+        "This is checked by multiplying by value from previous value of sigma"
+        if oldtest*testIR<0: #and chiFields[umesh-1,0]>0:
+           
+            truesigma[j]=sl #save this value
+            j=j+1 #if there are other sigma values, they will be stored also
+            #print(truesigma)
+            
+        oldtest=testIR
+
+    
+    return truesigma
+temps=np.linspace(tmin,tmax,numtemp)
+#need up to 3 sigma values per temperature
+truesigma=np.zeros([numtemp,3])
+
+for i in range (0,numtemp):
+    truesigma[i,:]=sigmasearch(temps[i],mu,ml)
+    
+plt.scatter(temps,truesigma[:,0])
+plt.scatter(temps,truesigma[:,1])
+plt.scatter(temps,truesigma[:,2])
+minsigma=min(truesigma[:,0])-5
+maxsigma=max(truesigma[:,0])+5
+plt.ylim([minsigma,maxsigma])
+plt.xlabel('Temperature (MeV)')
+plt.ylabel(r'$\sigma^{1/3}$ (MeV)')
+plt.title(r'$m_q=%i$ MeV, $\mu=%i$ MeV' %(ml,mu))
+
+if max(truesigma[:,1])==0:
+    print("Crossover or 2nd order")
+else:
+    print("First order")    
+    
+    
