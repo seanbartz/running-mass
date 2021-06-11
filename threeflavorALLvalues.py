@@ -17,13 +17,13 @@ import matplotlib.pyplot as plt
 
 
 #light quark mass
-ml=30
+ml=38
 
 #chemical potential
 mu=30
 
-tmin=182
-tmax=188
+tmin=189
+tmax=189.6
 numtemp=20
 
 
@@ -31,13 +31,17 @@ numtemp=20
 
 def chiral(y,u,params):
     chi,chip=y
-    v3,v4,mu1,mu0,mu2,zh,q=params
+    v3,v4,zh,q=params
     
     Q=q*zh**3
     
     #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
     "derivative of the dilaton, using exp parameterization"
-    phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    """Fang uses mu sub-g = 440MeV, unto which becomes phi = mu-g^2 * z^2
+    thus phip = 2*mu-g^2 * z -> 2*mu-g*u*zh"""
+    "mu-g = 440"
+    phip = -2*(440**2)*u*(zh**2)
     f= 1 - (1+Q**2)*u**4 + Q**2*u**6
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
@@ -62,11 +66,6 @@ def sigmasearch(T,mu,ml):
     u=np.linspace(ui,uf,umesh)
     
     
-    #parameters for dilaton. See papers
-    mu0 = 430
-    mu1 = 830
-    mu2 = 176
-    
     
  
     
@@ -80,7 +79,7 @@ def sigmasearch(T,mu,ml):
     v3 = -3
         
     #sigmal=260**3
-    params=v3,v4,mu1,mu0,mu2,zh,q
+    params=v3,v4,zh,q
     "blackness function and its derivative, Reissner-Nordstrom metric"
     "This version is for finite temp, finite chemical potential"
     f = 1 - (1+Q**2)*u**4 + Q**2*u**6
