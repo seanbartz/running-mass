@@ -39,9 +39,8 @@ def chiral(y,u,params):
     f= 1 - (1+Q**2)*u**4 + Q**2*u**6
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
-     derivs=[chip,
-           chip * (fp/f + 3/(zh*u) - phip) + 1/u*f * (chi*(-3 - muc**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2))))]
-            
+    derivs=[chip,
+          -chip * (fp/f + 3/(zh*u) - phip) + 1/(u*f) * (chi*(-3 - muc**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2))))]          
     return derivs
 
 "solve for horizon and charge"
@@ -77,8 +76,6 @@ muc=1200
 
 #sigmal=260**3
 params=v3,v4,zh,q,lam,gam,muc 
-#sigmal=260**3
-params=v3,v4,mu1,mu0,mu2,zh,q
 "blackness function and its derivative, Reissner-Nordstrom metric"
 "This version is for finite temp, finite chemical potential"
 f = 1 - (1+Q**2)*u**4 + Q**2*u**6
