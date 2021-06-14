@@ -34,6 +34,7 @@ ml=50
 
 
 def chiral(y,u,params):
+    global chi,chip
     chi,chip=y
 
     v3,v4,zh,q,lam,gam,muc=params
@@ -122,7 +123,7 @@ def sigmasearch(T,mu,ml):
             
             "test function defined to find when the chiral field doesn't diverge"
             "When test function is zero at uf, the chiral field doesn't diverge"
-            test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]-3*v3*chiFields[:,0]**2-4*v4*chiFields[:,0]**3)
+            test = -u**2 * chip*fp/f - 1/f *(chi*(-3-muc**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
             testIR = test[umesh-1]#value of test function at uf
             
             "when test function crosses zero, it will go from + to -, or vice versa"
