@@ -31,8 +31,9 @@ numtemp=20
 
 def chiral(y,u,params):
     chi,chip=y
-    v3,v4,zh,q=params
-    
+
+    v3,v4,zh,q,lam,gam,muc=params
+
     Q=q*zh**3
     
     #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
@@ -46,9 +47,7 @@ def chiral(y,u,params):
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
     derivs=[chip,
-            ((3*f-u*fp+u*f*phip)/(u*f))*chip - (3*chi-3*v3*chi**2-4*v4*chi**3)/(u**2*f)]
-            #((3+u**4)/(u-u**5) +phip)*chip - (-3*chi+4*v4*chi**3)/(u**2-u**6) ]
-            
+          -chip * (fp/f + 3/(zh*u) - phip) + 1/(u*f) * (chi*(-3 - muc**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2))))]          
     return derivs
 
 def sigmasearch(T,mu,ml):
@@ -66,9 +65,7 @@ def sigmasearch(T,mu,ml):
     u=np.linspace(ui,uf,umesh)
     
     
-    
- 
-    
+
     "This is a constant that goes into the boundary conditions"
     eta=np.sqrt(3)/(2*np.pi)
     
@@ -77,9 +74,17 @@ def sigmasearch(T,mu,ml):
     #v3= -3 #only needed for 2+1 flavor
     v4 = 8
     v3 = -3
+    
+    "Gamma"
+    gam=-22.6
+    "Lambda"
+    lam=16.8
+    
+    muc=1200
         
     #sigmal=260**3
-    params=v3,v4,zh,q
+    params=v3,v4,zh,q,lam,gam,muc
+
     "blackness function and its derivative, Reissner-Nordstrom metric"
     "This version is for finite temp, finite chemical potential"
     f = 1 - (1+Q**2)*u**4 + Q**2*u**6
