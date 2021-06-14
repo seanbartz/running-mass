@@ -19,6 +19,9 @@ Temp=300.
 ml=50
 #chem potential
 mu=50
+#described as crucial to the linear Regge behavior of meson spectrum
+#which is intreoduced in the bulk scalar mass, m2-5 (in MeV)
+mu_g = 440 
 
 #value of the cube root of chiral condensate in MeV
 #386-387 MeV
@@ -39,8 +42,7 @@ def chiral(y,u,params):
     #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
     """Fang uses mu sub-g = 440MeV, unto which becomes phi = mu-g^2 * z^2
     thus phip = 2*mu-g^2 * z -> 2*mu-g*u*zh"""
-    "mu-g = 440"
-    phip = -2*(440**2)*u*(zh**2)
+    phip = -2*(mu_g**2)*u*(zh**2)
     'Reissner-Nordstrom blackness function and its derivative.'
     f= 1 - (1+Q**2)*u**4 + Q**2*u**6
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
