@@ -14,27 +14,33 @@ from solveTmu import blackness
 import matplotlib.pyplot as plt
 
 # "temperature in MeV"
-Temp=185.
+Temp=300.
 #light quark mass
-ml=30
+ml=50
 #chem potential
-mu=30
+mu=50
 
 #value of the cube root of chiral condensate in MeV
-sl=200
-
+#386-387 MeV
+sl=483
 
 
 
 def chiral(y,u,params):
     chi,chip=y
+
     v3,v4,zh,q,lam,gam,muc=params
+
     
     Q=q*zh**3
     
     #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
     "derivative of the dilaton, using exp parameterization"
-    phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    """Fang uses mu sub-g = 440MeV, unto which becomes phi = mu-g^2 * z^2
+    thus phip = 2*mu-g^2 * z -> 2*mu-g*u*zh"""
+    "mu-g = 440"
+    phip = -2*(440**2)*u*(zh**2)
     'Reissner-Nordstrom blackness function and its derivative.'
     f= 1 - (1+Q**2)*u**4 + Q**2*u**6
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
@@ -55,6 +61,7 @@ uf = 0.999
 "Create the spatial variable mesh"
 umesh=100
 u=np.linspace(ui,uf,umesh)
+
  
 
 "This is a constant that goes into the boundary conditions"
@@ -75,7 +82,9 @@ lam=16.8
 muc=1200
 
 #sigmal=260**3
+
 params=v3,v4,zh,q,lam,gam,muc 
+
 "blackness function and its derivative, Reissner-Nordstrom metric"
 "This version is for finite temp, finite chemical potential"
 f = 1 - (1+Q**2)*u**4 + Q**2*u**6
@@ -94,8 +103,10 @@ testIR = test[umesh-1]#value of test function at uf
 
 #chiralPot=v3*chiFields[:,0]**3+v4*chiFields[:,0]**4
 
+
 plt.plot(u,chiFields[:,0])
 plt.xlabel(r'$z/z_h$')
 plt.ylabel(r'$\chi(z)$')
 #plt.plot(u,test)
+
 #plt.plot(u,chiralPot)

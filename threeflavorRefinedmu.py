@@ -19,28 +19,34 @@ from solveTmu import blackness
 #import time
 
 
-
+"LOOK AT LINE 147-148"
 
 
 
 
 # "temperature in MeV"
-# Temp=150
-# #light quark mass
-# ml=30
+Temp=300
+#light quark mass
+ml=50
 
 
 
 
 def chiral(y,u,params):
     chi,chip=y
+
     v3,v4,zh,q,lam,gam,muc=params
+
     
     Q=q*zh**3
     
     #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
     "derivative of the dilaton, using exp parameterization"
-    phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    """Fang uses mu sub-g = 440MeV, unto which becomes phi = mu-g^2 * z^2
+    thus phip = 2*mu-g^2 * z -> 2*mu-g*u*zh"""
+    "mu-g = 440"
+    phip = -2*(440**2)*u*(zh**2)
     "blackness function and its derivative, Reissner-Nordstrom metric"
     "This version is for finite temp, finite chemical potential"
     f= 1 - (1+Q**2)*u**4 + Q**2*u**6
@@ -65,6 +71,7 @@ def sigmasearch(T,mu,ml):
     u=np.linspace(ui,uf,umesh)
     
     
+
     "This is a constant that goes into the boundary conditions"
     eta=np.sqrt(3)/(2*np.pi)
     
@@ -82,7 +89,9 @@ def sigmasearch(T,mu,ml):
     muc=1200
     
     #sigmal=260**3
+
     params=v3,v4,zh,q,lam,gam,muc
+
     "blackness function and its derivative, Reissner-Nordstrom metric"
     "This version is for finite temp, finite chemical potential"
     f = 1 - (1+Q**2)*u**4 + Q**2*u**6
@@ -142,8 +151,8 @@ def sigmasearch(T,mu,ml):
     
     return truesigma,zh#,chiFields,u
 'call the function with arguments temperature, chemical potential, and quark mass'
-(truesigma,zh)=sigmasearch(185,30,30)
-print(truesigma)
+#(truesigma,zh)=sigmasearch(300,50,50)
+#print(truesigma)
 
 #sigmal=sl**3
 #UVbound =[ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]
