@@ -29,15 +29,20 @@ mu_g = 440
 Temp=300
 #light quark mass
 ml=50
+#strange quark mass
+ms=ml
 
+#zeta, normalization constant which is defined by n_c, number of colors
+n_c = 3
+zeta = np.sqrt(n_c)/(2*np.pi)
 
 
 
 def chiral(y,u,params):
     global chi,chip
     chi,chip=y
-
-    v3,v4,zh,q,lam,gam,muc=params
+    
+    v3,v4,zh,q,lam,gam,mu_c=params
 
     
     Q=q*zh**3
@@ -54,7 +59,7 @@ def chiral(y,u,params):
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
     derivs=[chip,
-          -chip * (fp/f + 3/(zh*u) - phip) + 1/(u*f) * (chi*(-3 - muc**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2))))]          
+          -chip * (fp/f + 3/(zh*u) - phip) + 1/(u*f) * (chi*(-3 - mu_c**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2))))]          
     return derivs
 
 def sigmasearch(T,mu,ml):
@@ -74,7 +79,7 @@ def sigmasearch(T,mu,ml):
     
 
     "This is a constant that goes into the boundary conditions"
-    eta=np.sqrt(3)/(2*np.pi)
+    #eta=np.sqrt(3)/(2*np.pi)
     
     "For the scalar potential in the action"
     "see papers by Bartz, Jacobson"
@@ -87,11 +92,11 @@ def sigmasearch(T,mu,ml):
     "Lambda"
     lam=16.8
     
-    muc=1200
+    mu_c=1200
     
     #sigmal=260**3
 
-    params=v3,v4,zh,q,lam,gam,muc
+    params=v3,v4,zh,q,lam,gam,mu_c
 
     "blackness function and its derivative, Reissner-Nordstrom metric"
     "This version is for finite temp, finite chemical potential"
@@ -116,14 +121,19 @@ def sigmasearch(T,mu,ml):
         for sl in range (minsigma,maxsigma,deltasig):
             "values for chiral field and derivative at UV boundary"
             sigmal = sl**3
-            UVbound = [ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]
+            #z is very VERY close to zero
+            #(old) UVbound = [ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]
+            #new UVbound from Fang eqn. 11, [chi, chip]
+            UVbound = [ml*zeta*(zh*ui)-((ml*ms*gam*zeta**2)/(2*np.sqrt(2)))*(zh*ui)**2 + (sigmal/zeta)*(zh*ui)**3 + 0.0625*ml*zeta*((-ms**2)*(gam**2)*(zeta**2) - (ml**2)*(gam**2)*(zeta**2) + 8*(ms**2)*(zeta**2)*gam + 16*(mu_g**2) - 8*(mu_c**2)) * ((zh*ui)**3)*np.log(zh*ui),   
+                       ml*zeta*(zh)-2*((ml*ms*gam*zeta**2)/(2*np.sqrt(2)))*(zh**2*ui) + 3*(sigmal/zeta)*(zh**3*ui**2) + 0.0625*ml*zeta*((-ms**2)*(gam**2)*(zeta**2) - (ml**2)*(gam**2)*(zeta**2) + 8*(ms**2)*(zeta**2)*gam + 16*(mu_g**2) - 8*(mu_c**2)) * zh**3*(3*ui**2*np.log(zh*ui)+ui**2)]
+
             
             "solve for the chiral field"
             chiFields=odeint(chiral,UVbound,u,args=(params,))
             
             "test function defined to find when the chiral field doesn't diverge"
             "When test function is zero at uf, the chiral field doesn't diverge"
-            test = -u**2 * chip*fp/f - 1/f *(chi*(-3-muc**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
+            test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
             testIR = test[umesh-1]#value of test function at uf
             
             "when test function crosses zero, it will go from + to -, or vice versa"
