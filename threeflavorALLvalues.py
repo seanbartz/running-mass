@@ -52,12 +52,12 @@ def chiral(y,u,params):
     #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
     """Fang uses mu sub-g = 440MeV, unto which becomes phi = mu-g^2 * z^2
     thus phip = 2*mu-g^2 * z -> 2*mu-g*u*zh"""
-    phip = -2*(mu_g**2)*u*(zh**2)
+    phip = 2*(mu_g**2)*u*(zh**2)
     f= 1 - (1+Q**2)*u**4 + Q**2*u**6
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
     derivs=[chip,
-          -(chip * (fp/f + 3/(zh*u) - phip) + 1/(u*f) * (chi*(-3 - mu_c**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2)))))]          
+          -(chip * (fp/f + 3/u - phip) + 1/(u**2*f) * (chi*(-3 - mu_c**2 * (u*zh)**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2)))))]          
     return derivs
 
 def sigmasearch(T,mu,ml):
