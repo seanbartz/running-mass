@@ -59,7 +59,7 @@ def chiral(y,u,params):
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
     derivs=[chip,
-          -chip * (fp/f + 3/(zh*u) - phip) + 1/(u*f) * (chi*(-3 - mu_c**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2))))]          
+          -(chip * (fp/f + 3/(zh*u) - phip) + 1/(u*f) * (chi*(-3 - mu_c**2 * zh**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2)))))]          
     return derivs
 
 def sigmasearch(T,mu,ml):
