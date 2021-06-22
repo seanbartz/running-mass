@@ -14,13 +14,13 @@ from solveTmu import blackness
 import matplotlib.pyplot as plt
 
 # "temperature in MeV"
-Temp=300.
+Temp=180.
 #light quark mass
-ml=50
+ml=35
 #strange quark mass
 ms=ml
 #chem potential
-mu=50
+mu=0
 #described as crucial to the linear Regge behavior of meson spectrum
 #which is intreoduced in the bulk scalar mass, m2-5 (in MeV, Fang)
 mu_g = 440 
@@ -30,7 +30,7 @@ zeta = np.sqrt(n_c)/(2*np.pi)
 
 #value of the cube root of chiral condensate in MeV
 #386-387 MeV
-sl=483
+sl=386
 
 
 def chiral(y,u,params):
@@ -39,6 +39,9 @@ def chiral(y,u,params):
     
     v3,v4,zh,q,lam,gam,mu_c=params
 
+    mu0 = 430
+    mu1 = 830
+    mu2 = 176
     
     Q=q*zh**3
     
@@ -53,7 +56,7 @@ def chiral(y,u,params):
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
     derivs=[chip,
-          -(chip * (fp/f + 3/u - phip) + 1/(u**2*f) * (chi*(-3 - mu_c**2 * (u*zh)**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2)))))]          
+          -(chip * (fp/f - 3/u - phip) - 1/(u**2*f) * (chi*(-3 - mu_c**2 * (u*zh)**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2)))))]          
     return derivs
 
 "solve for horizon and charge"
@@ -110,6 +113,7 @@ chiFields=odeint(chiral,UVbound,u,args=(params,))
 "test function defined to find when the chiral field doesn't diverge"
 "When test function is zero at uf, the chiral field doesn't diverge"
 test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
+# test = -u**2 * chiFields[:,1]*fp/f + 1/f *(chiFields[:,0]*(-3-mu_c**2*u**2*zh**2) + (chiFields[:,0]**3*(gam/ 2*np.sqrt(2))) + lam*chiFields[:,0]**2)
 testIR = test[umesh-1]#value of test function at uf
 
 #chiralPot=v3*chiFields[:,0]**3+v4*chiFields[:,0]**4

@@ -26,9 +26,10 @@ from solveTmu import blackness
 mu_g = 440 
 
 # "temperature in MeV"
-Temp=300
+Temp=180
+mu=0
 #light quark mass
-ml=50
+ml=35
 #strange quark mass
 ms=ml
 
@@ -44,7 +45,9 @@ def chiral(y,u,params):
     
     v3,v4,zh,q,lam,gam,mu_c=params
 
-    
+    mu0 = 430
+    mu1 = 830
+    mu2 = 176
     Q=q*zh**3
     
     #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
@@ -59,7 +62,7 @@ def chiral(y,u,params):
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
     "EOM for chiral field"
     derivs=[chip,
-          -(chip * (fp/f + 3/u - phip) + 1/(u**2*f) * (chi*(-3 - mu_c**2 * (u*zh)**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2)))))]          
+          -(chip * (fp/f - 3/u - phip) - 1/(u**2*f) * (chi*(-3 - mu_c**2 * (u*zh)**2) + chi**3 *lam + chi**2*(gam/(2 * np.sqrt(2)))))]          
     return derivs
 
 def sigmasearch(T,mu,ml):
@@ -92,7 +95,7 @@ def sigmasearch(T,mu,ml):
     "Lambda"
     lam=16.8
     
-    mu_c=1200
+    mu_c=0 #try without running mass for now
     
     #sigmal=260**3
 
@@ -134,6 +137,7 @@ def sigmasearch(T,mu,ml):
             "test function defined to find when the chiral field doesn't diverge"
             "When test function is zero at uf, the chiral field doesn't diverge"
             test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
+            # test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]-3*v3*chiFields[:,0]**2-4*v4*chiFields[:,0]**3)
             testIR = test[umesh-1]#value of test function at uf
             
             "when test function crosses zero, it will go from + to -, or vice versa"
@@ -162,8 +166,8 @@ def sigmasearch(T,mu,ml):
     
     return truesigma,zh#,chiFields,u
 'call the function with arguments temperature, chemical potential, and quark mass'
-#(truesigma,zh)=sigmasearch(300,50,50)
-#print(truesigma)
+(truesigma,zh)=sigmasearch(Temp,mu,ml)
+print(truesigma)
 
 #sigmal=sl**3
 #UVbound =[ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]
