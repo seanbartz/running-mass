@@ -12,12 +12,12 @@ from threeflavorRefinedmu import sigmasearch
 import matplotlib.pyplot as plt
 
 "light quark mass"
-quarkmass=30
+quarkmass=15
 "quark chemical potential"
-chemPotential=30
+chemPotential=0
 
-numtemps=20
-temps=np.linspace(182,188,numtemps)
+numtemps=50
+temps=np.linspace(140,150,numtemps)
 
 sigmaArray=np.zeros(numtemps)
 

@@ -14,9 +14,9 @@ from solveTmu import blackness
 import matplotlib.pyplot as plt
 
 # "temperature in MeV"
-Temp=180.
+Temp=250.
 #light quark mass
-ml=35
+ml=30
 #strange quark mass
 ms=ml
 #chem potential
@@ -30,7 +30,7 @@ zeta = np.sqrt(n_c)/(2*np.pi)
 
 #value of the cube root of chiral condensate in MeV
 #386-387 MeV
-sl=386
+sl=140
 
 
 def chiral(y,u,params):
@@ -47,7 +47,7 @@ def chiral(y,u,params):
     
     #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
     "derivative of the dilaton, using exp parameterization"
-    #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
+    # phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
     """Fang uses mu sub-g = 440MeV, unto which becomes phi = mu-g^2 * z^2
     thus phip = 2*mu-g^2 * z -> 2*mu-g*u*zh"""
     phip = 2*(mu_g**2)*u*(zh**2)
@@ -112,8 +112,8 @@ chiFields=odeint(chiral,UVbound,u,args=(params,))
 
 "test function defined to find when the chiral field doesn't diverge"
 "When test function is zero at uf, the chiral field doesn't diverge"
-test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
-# test = -u**2 * chiFields[:,1]*fp/f + 1/f *(chiFields[:,0]*(-3-mu_c**2*u**2*zh**2) + (chiFields[:,0]**3*(gam/ 2*np.sqrt(2))) + lam*chiFields[:,0]**2)
+#test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
+test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]+lam*chiFields[:,0]**2+gam/(2*np.sqrt(2))*chiFields[:,0]**3)
 testIR = test[umesh-1]#value of test function at uf
 
 #chiralPot=v3*chiFields[:,0]**3+v4*chiFields[:,0]**4
@@ -122,6 +122,6 @@ testIR = test[umesh-1]#value of test function at uf
 plt.plot(u,chiFields[:,0])
 plt.xlabel(r'$z/z_h$')
 plt.ylabel(r'$\chi(z)$')
-#plt.plot(u,test)
+# plt.plot(u,test)
 
 #plt.plot(u,chiralPot)

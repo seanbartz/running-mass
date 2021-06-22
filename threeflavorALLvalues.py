@@ -17,10 +17,10 @@ import matplotlib.pyplot as plt
 
 
 #light quark mass
-ml=38
+ml=15
 
 #chemical potential
-mu=30
+mu=0
 
 #strange quark mass
 ms=ml
@@ -29,8 +29,8 @@ ms=ml
 #which is intreoduced in the bulk scalar mass, m2-5 (in MeV)
 mu_g = 440 
 
-tmin=189
-tmax=189.6
+tmin=142
+tmax=146
 numtemp=20
 
 #zeta, normalization constant which is defined by n_c, number of colors
@@ -104,8 +104,8 @@ def sigmasearch(T,mu,ml):
     "Note: search should be done over cube root of sigma, here called sl"
     deltasig = 1
     #tic = time.perf_counter()
-    minsigma = 260
-    maxsigma = 500
+    minsigma = 0
+    maxsigma = 260
     truesigma = 0
     "This version steps over all values to find multiple solutions at some temps"
     
@@ -129,7 +129,7 @@ def sigmasearch(T,mu,ml):
         
         "test function defined to find when the chiral field doesn't diverge"
         "When test function is zero at uf, the chiral field doesn't diverge"
-        test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
+        test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]+lam*chiFields[:,0]**2+gam/(2*np.sqrt(2))*chiFields[:,0]**3)
         testIR = test[umesh-1]#value of test function at uf
         
         "when test function crosses zero, it will go from + to -, or vice versa"

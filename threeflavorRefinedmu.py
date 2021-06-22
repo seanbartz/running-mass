@@ -26,10 +26,10 @@ from solveTmu import blackness
 mu_g = 440 
 
 # "temperature in MeV"
-Temp=180
+Temp=140
 mu=0
 #light quark mass
-ml=35
+ml=30
 #strange quark mass
 ms=ml
 
@@ -95,7 +95,7 @@ def sigmasearch(T,mu,ml):
     "Lambda"
     lam=16.8
     
-    mu_c=0 #try without running mass for now
+    mu_c=1200 #try without running mass for now
     
     #sigmal=260**3
 
@@ -110,10 +110,10 @@ def sigmasearch(T,mu,ml):
     "Note: search should be done over cube root of sigma, here called sl"
     deltasig = 100
     #tic = time.perf_counter()
-    minsigma = 100
+    minsigma = 0
     maxsigma = 500
     "initialize variable for correct sigma value"
-    truesigma = []
+    truesigma = 0
     "This version uses a refining method to search"
     "Runs an order of magnitude faster"
     while deltasig > 0.1:
@@ -136,8 +136,8 @@ def sigmasearch(T,mu,ml):
             
             "test function defined to find when the chiral field doesn't diverge"
             "When test function is zero at uf, the chiral field doesn't diverge"
-            test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
-            # test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]-3*v3*chiFields[:,0]**2-4*v4*chiFields[:,0]**3)
+            # test = -u**2 * chip*fp/f - 1/f *(chi*(-3-mu_c**2*u**2*zh**2) + (chi**3*(gam/ 2*np.sqrt(2))) + lam*chi**2)
+            test = ((-u**2*fp)/f)*chiFields[:,1]-1/f*(3*chiFields[:,0]+lam*chiFields[:,0]**2+gam/(2*np.sqrt(2))*chiFields[:,0]**3)
             testIR = test[umesh-1]#value of test function at uf
             
             "when test function crosses zero, it will go from + to -, or vice versa"
