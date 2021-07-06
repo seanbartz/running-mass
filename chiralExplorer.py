@@ -39,9 +39,9 @@ def chiral(y,u,params):
     
     v3,v4,zh,q,lam,gam,mu_c=params
 
-    mu0 = 430
-    mu1 = 830
-    mu2 = 176
+    #mu0 = 430
+    #mu1 = 830
+    #mu2 = 176
     
     Q=q*zh**3
     
@@ -104,8 +104,8 @@ sigmal = sl**3
 #z is very VERY close to zero
 #(old) UVbound = [ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]
 #new UVbound from Fang eqn. 11, [chi, chip]
-UVbound = [ml*zeta*(zh*ui)-((ml*ms*gam*zeta**2)/(2*np.sqrt(2)))*(zh*ui)**2 + (sigmal/zeta)*(zh*ui)**3 + 0.0625*ml*zeta*((-ms**2)*(gam**2)*(zeta**2) - (ml**2)*(gam**2)*(zeta**2) + 8*(ms**2)*(zeta**2)*gam + 16*(mu_g**2) - 8*(mu_c**2)) * ((zh*ui)**3)*np.log(zh*ui),   
-           ml*zeta*(zh)-2*((ml*ms*gam*zeta**2)/(2*np.sqrt(2)))*(zh**2*ui) + 3*(sigmal/zeta)*(zh**3*ui**2) + 0.0625*ml*zeta*((-ms**2)*(gam**2)*(zeta**2) - (ml**2)*(gam**2)*(zeta**2) + 8*(ms**2)*(zeta**2)*gam + 16*(mu_g**2) - 8*(mu_c**2)) * zh**3*(3*ui**2*np.log(zh*ui)+ui**2)]
+UVbound = [ml*zeta*(zh*ui)-((ml*ms*gam*zeta**2)/(2*np.sqrt(2)))*(zh*ui)**2 + (sigmal/zeta)*(zh*ui)**3 + 0.0625*ml*zeta*((-ms**2)*(gam**2)*(zeta**2) - (ml**2)*(gam**2)*(zeta**2) + 8*(ml**2)*(zeta**2)*gam + 16*(mu_g**2) - 8*(mu_c**2)) * ((zh*ui)**3)*np.log(zh*ui),   
+           ml*zeta*(zh)-2*((ml*ms*gam*zeta**2)/(2*np.sqrt(2)))*(zh**2*ui) + 3*(sigmal/zeta)*(zh**3*ui**2) + 0.0625*ml*zeta*((-ms**2)*(gam**2)*(zeta**2) - (ml**2)*(gam**2)*(zeta**2) + 8*(ml**2)*(zeta**2)*gam + 16*(mu_g**2) - 8*(mu_c**2)) * zh**3*(3*ui**2*np.log(zh*ui)+ui**2)]
 
 "solve for the chiral field"
 chiFields=odeint(chiral,UVbound,u,args=(params,))
