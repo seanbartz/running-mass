@@ -19,37 +19,15 @@ from solveTmu import blackness
 #import time
 
 
-"LOOK AT LINE 147-148"
-
-#described as crucial to the linear Regge behavior of meson spectrum
-#which is intreoduced in the bulk scalar mass, m2-5 (in MeV)
-mu_g = 440 
-
-# "temperature in MeV"
-Temp=140
-mu=0
-#light quark mass
-ml=30
-#strange quark mass
-ms=ml
-
-#zeta, normalization constant which is defined by n_c, number of colors
-n_c = 3
-zeta = np.sqrt(n_c)/(2*np.pi)
-
-
-
 def chiral(y,u,params):
     global chi,chip
     chi,chip=y
     
-    v3,v4,zh,q,lam,gam,mu_c=params
+    zh,q,lam,gam,mu_c,mu_g=params
 
-    mu0 = 430
-    mu1 = 830
-    mu2 = 176
     Q=q*zh**3
     
+
     #phi = -(mu1*zh*u)**2 + (mu1**2+mu0**2)*(zh*u)**2*(1 - np.exp(-(mu2*zh*u)**2))
     "derivative of the dilaton, using exp parameterization"
     #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
@@ -66,6 +44,9 @@ def chiral(y,u,params):
     return derivs
 
 def sigmasearch(T,mu,ml):
+    "In three-flavor case, ms=ml"
+    ms=ml
+    
     "solve for horizon and charge"
     zh,q=blackness(T,mu)
     Q=q*zh**3
@@ -82,24 +63,20 @@ def sigmasearch(T,mu,ml):
     
 
     "This is a constant that goes into the boundary conditions"
-    #eta=np.sqrt(3)/(2*np.pi)
-    
-    "For the scalar potential in the action"
-    "see papers by Bartz, Jacobson"
-    #v3= -3 #only needed for 2+1 flavor
-    v4 = 8
-    v3 = -3
-    
-    "Gamma"
-    gam=-22.6
-    "Lambda"
+    n_c = 3
+    zeta = np.sqrt(n_c)/(2*np.pi)    
+    "Dilaton parameter needed in boundary conditions"
+    mu_g=440
+
+    "Gamma is the coefficient of the cubic term in the scalar potential in the Fang paper"
+    gam = -22.6
+    "Lambda is the coefficient of the quartic term in the scalar potential in the Fang paper"
     lam=16.8
     
-    mu_c=1200 #try without running mass for now
-    
-    #sigmal=260**3
+    "mu_c sets the scale of the running scalar mass term in the Fang paper"
+    mu_c=1200 
 
-    params=v3,v4,zh,q,lam,gam,mu_c
+    params=zh,q,lam,gam,mu_c,mu_g
 
     "blackness function and its derivative, Reissner-Nordstrom metric"
     "This version is for finite temp, finite chemical potential"
@@ -111,7 +88,7 @@ def sigmasearch(T,mu,ml):
     deltasig = 100
     #tic = time.perf_counter()
     minsigma = 0
-    maxsigma = 500
+    maxsigma = 300
     "initialize variable for correct sigma value"
     truesigma = 0
     "This version uses a refining method to search"
@@ -166,8 +143,8 @@ def sigmasearch(T,mu,ml):
     
     return truesigma,zh#,chiFields,u
 'call the function with arguments temperature, chemical potential, and quark mass'
-(truesigma,zh)=sigmasearch(Temp,mu,ml)
-print(truesigma)
+#(truesigma,zh)=sigmasearch(Temp,mu,ml)
+#print(truesigma)
 
 #sigmal=sl**3
 #UVbound =[ml*eta*zh*ui + sigmal/eta*(zh*ui)**3, ml*eta*zh + 3*sigmal/eta*zh**3*ui**2]

@@ -12,12 +12,12 @@ from threeflavorRefinedmu import sigmasearch
 import matplotlib.pyplot as plt
 
 "light quark mass"
-quarkmass=15
+quarkmass=22
 "quark chemical potential"
 chemPotential=0
 
-numtemps=50
-temps=np.linspace(140,150,numtemps)
+numtemps=20
+temps=np.linspace(145,150,numtemps)
 
 sigmaArray=np.zeros(numtemps)
 
@@ -27,7 +27,7 @@ for i in range(0,numtemps):
     # if i % 10 ==0:
     #     print(temps[i])
     "Stop the scan if we are basically at zero"
-    if sigmaArray[i]<=20:
+    if sigmaArray[i]<=1:
         break
 
 plt.scatter(temps,sigmaArray)

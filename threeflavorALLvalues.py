@@ -17,33 +17,21 @@ import matplotlib.pyplot as plt
 
 
 #light quark mass
-ml=15
+quarkmass=22
 
 #chemical potential
-mu=0
+chempotential=0
 
-#strange quark mass
-ms=ml
-
-#described as crucial to the linear Regge behavior of meson spectrum
-#which is intreoduced in the bulk scalar mass, m2-5 (in MeV)
-mu_g = 440 
-
-tmin=142
-tmax=146
-numtemp=20
-
-#zeta, normalization constant which is defined by n_c, number of colors
-n_c = 3
-zeta = np.sqrt(n_c)/(2*np.pi)
-
+tmin=148
+tmax=150
+numtemp=40
 
 
 def chiral(y,u,params):
     global chi,chip
     chi,chip=y
 
-    v3,v4,zh,q,lam,gam,mu_c=params
+    zh,q,lam,gam,mu_c=params
 
     Q=q*zh**3
     
@@ -52,6 +40,7 @@ def chiral(y,u,params):
     #phip= 2*u*zh**2*(mu0**2+np.exp(-(mu2*zh*u)**2)*(mu0**2+mu1**2)*((u*zh*mu2)**2-1) )
     """Fang uses mu sub-g = 440MeV, unto which becomes phi = mu-g^2 * z^2
     thus phip = 2*mu-g^2 * z -> 2*mu-g*u*zh"""
+    mu_g = 440 
     phip = 2*(mu_g**2)*u*(zh**2)
     f= 1 - (1+Q**2)*u**4 + Q**2*u**6
     fp= -4*(1+Q**2)*u**3 + 6*Q**2*u**5
@@ -61,6 +50,9 @@ def chiral(y,u,params):
     return derivs
 
 def sigmasearch(T,mu,ml):
+    "strange quark mass same as light quark mass for 3 flavor"
+    ms=ml
+    
     "solve for horizon and charge"
     zh,q=blackness(T,mu)
     Q=q*zh**3
@@ -77,23 +69,22 @@ def sigmasearch(T,mu,ml):
     
 
     "This is a constant that goes into the boundary conditions"
-    #eta=np.sqrt(3)/(2*np.pi)
+    #zeta, normalization constant which is defined by n_c, number of colors
+    n_c = 3
+    zeta = np.sqrt(n_c)/(2*np.pi)
     
-    "For the scalar potential in the action"
-    "see papers by Bartz, Jacobson"
-    #v3= -3 #only needed for 2+1 flavor
-    v4 = 8
-    v3 = -3
-    
-    "Gamma"
-    gam=-22.6
-    "Lambda"
+    "Gamma is the coefficient of the cubic term in the scalar potential in the Fang paper"
+    gam = -22.6
+    "Lambda is the coefficient of the quartic term in the scalar potential in the Fang paper"
     lam=16.8
     
-    mu_c=1200
+    "mu_c sets the scale of the running scalar mass term in the Fang paper"
+    mu_c=1200 
+    
+    "Dilaton parameter needed in boundary conditions"
+    mu_g=440
         
-    #sigmal=260**3
-    params=v3,v4,zh,q,lam,gam,mu_c
+    params=zh,q,lam,gam,mu_c
 
     "blackness function and its derivative, Reissner-Nordstrom metric"
     "This version is for finite temp, finite chemical potential"
@@ -105,7 +96,7 @@ def sigmasearch(T,mu,ml):
     deltasig = 1
     #tic = time.perf_counter()
     minsigma = 0
-    maxsigma = 260
+    maxsigma = 500
     truesigma = 0
     "This version steps over all values to find multiple solutions at some temps"
     
@@ -135,10 +126,10 @@ def sigmasearch(T,mu,ml):
         "when test function crosses zero, it will go from + to -, or vice versa"
         "This is checked by multiplying by value from previous value of sigma"
         if oldtest*testIR<0: #and chiFields[umesh-1,0]>0:
-           
-            truesigma[j]=sl #save this value
-            j=j+1 #if there are other sigma values, they will be stored also
-            #print(truesigma)
+            if j<3:
+                truesigma[j]=sl #save this value
+                j=j+1 #if there are other sigma values, they will be stored also
+                #print(truesigma)
             
         oldtest=testIR
 
@@ -149,7 +140,7 @@ temps=np.linspace(tmin,tmax,numtemp)
 truesigma=np.zeros([numtemp,3])
 
 for i in range (0,numtemp):
-    truesigma[i,:]=sigmasearch(temps[i],mu,ml)
+    truesigma[i,:]=sigmasearch(temps[i],chempotential,quarkmass)
     
 plt.scatter(temps,truesigma[:,0])
 plt.scatter(temps,truesigma[:,1])
@@ -159,7 +150,7 @@ maxsigma=max(truesigma[:,0])+5
 plt.ylim([minsigma,maxsigma])
 plt.xlabel('Temperature (MeV)')
 plt.ylabel(r'$\sigma^{1/3}$ (MeV)')
-plt.title(r'$m_q=%i$ MeV, $\mu=%i$ MeV' %(ml,mu))
+plt.title(r'$m_q=%i$ MeV, $\mu=%i$ MeV' %(quarkmass,chempotential))
 
 if max(truesigma[:,1])==0:
     print("Crossover or 2nd order")
