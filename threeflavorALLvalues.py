@@ -93,11 +93,14 @@ def sigmasearch(T,mu,ml):
     
     "stepsize for search over sigma"
     "Note: search should be done over cube root of sigma, here called sl"
+    
+    "deltasig may be adjusted, does not have to be integer"
     deltasig = 1
     #tic = time.perf_counter()
     minsigma = 0
-    maxsigma = 500
-    truesigma = 0
+    maxsigma = 300
+    numsigma=int((maxsigma-minsigma+1)/deltasig)
+    sigmavals=np.linspace(minsigma,maxsigma,numsigma)
     "This version steps over all values to find multiple solutions at some temps"
     
     "initial values for comparing test function"
@@ -105,8 +108,9 @@ def sigmasearch(T,mu,ml):
     j=0
     truesigma=np.zeros(3)
 
-    for sl in range (minsigma,maxsigma,deltasig):
-    
+    for i in range (0,numsigma):
+        
+        sl=sigmavals[i]
         "values for chiral field and derivative at UV boundary"
         sigmal = sl**3
         #z is very VERY close to zero
